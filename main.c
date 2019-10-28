@@ -88,7 +88,7 @@ void sendData(){
 	}
 	static unsigned long lasttime=0;
 	//TODO 0 mit millis() tauschen
-	if(lasttime+50>millis()){
+	if(lasttime+49>millis()){
 		return ;
 	}
 	int zahl = percentage(ADC_Read(ADC1D));
@@ -141,22 +141,37 @@ void setup()
 void draw(void)
 {
 	static unsigned long lasttime=0;
+	static unsigned int count = 0;
 	//TODO 0 mit millis() tauschen
-	if(lasttime+1000>millis()){
+	if(lasttime+100>millis()){
 		return ;
 	}
 	char a[20];
 	//sprintf(a,"%d",ADC_Read(ADC1D));
 	
 	sprintf(a,"%d",motorSpeed);
-	u8g_FirstPage(&u8g);
-	do
+	if(count==0)
 	{
-	u8g_DrawStr90(&u8g, 110, 0, "Bier");
-	u8g_DrawStr90(&u8g, 90, 0, a);
-	
-	} while ( u8g_NextPage(&u8g) );
-	
+		u8g_FirstPage(&u8g);
+		u8g_DrawStr90(&u8g, 110, 0, "Bier");
+		u8g_DrawStr90(&u8g, 90, 0, a);
+		u8g_NextPage(&u8g);
+		count = 1;
+	}
+	else
+	{
+		if (count>2)
+		{			
+			count=0;
+		}
+		else{
+			count++;
+		}
+		u8g_DrawStr90(&u8g, 110, 0, "Bier");
+		u8g_DrawStr90(&u8g, 90, 0, a);
+		u8g_NextPage(&u8g);
+		
+	}
 	lasttime = millis();
 	
 }
@@ -193,7 +208,6 @@ int main(void)
 		case display:
 			state = send;
 			wdt_enable(WDTO_1S);
-			u8g_FirstPage(&u8g);
 			draw();
 			wdt_disable();
 			wdt_reset();
