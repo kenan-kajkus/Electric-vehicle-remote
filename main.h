@@ -11,6 +11,7 @@
 
 /* Define UART baud rate here */
 #define UART_BAUD_RATE      9600
+
 volatile  int receivedUart = 0;
 enum statemachine
 {

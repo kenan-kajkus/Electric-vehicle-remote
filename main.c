@@ -16,7 +16,7 @@
 #include <avr/wdt.h>
 #include <string.h>
 
-#include "u8glib/csrc/u8g.h"
+#include "display.h"
 
 
 #define CTC_MATCH_OVERFLOW ((F_CPU / 1000)/8)
@@ -153,8 +153,7 @@ void draw(void)
 	if(count==0)
 	{
 		u8g_FirstPage(&u8g);
-		u8g_DrawStr90(&u8g, 110, 0, "Bier");
-		u8g_DrawStr90(&u8g, 90, 0, a);
+		renderDisplay(&u8g,a);
 		u8g_NextPage(&u8g);
 		count = 1;
 	}
@@ -167,8 +166,7 @@ void draw(void)
 		else{
 			count++;
 		}
-		u8g_DrawStr90(&u8g, 110, 0, "Bier");
-		u8g_DrawStr90(&u8g, 90, 0, a);
+		renderDisplay(&u8g,a);
 		u8g_NextPage(&u8g);
 		
 	}
