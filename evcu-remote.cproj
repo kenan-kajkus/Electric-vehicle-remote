@@ -122,6 +122,18 @@
     </ToolchainSettings>
   </PropertyGroup>
   <ItemGroup>
+    <Compile Include="periodicDisplayUpdater.c">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="periodicDisplayUpdater.h">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="ringbufferAveraging.c">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="ringbufferAveraging.h">
+      <SubType>compile</SubType>
+    </Compile>
     <Compile Include="display.c">
       <SubType>compile</SubType>
     </Compile>

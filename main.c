@@ -8,7 +8,6 @@
 #include "main.h"
 #include "uart.h"
 
-
 #include <stdio.h>
 #include <avr/io.h>
 #include <avr/interrupt.h>
@@ -17,6 +16,7 @@
 #include <string.h>
 
 #include "display.h"
+#include "ringbufferAveraging.h"
 
 
 #define CTC_MATCH_OVERFLOW ((F_CPU / 1000)/8)
@@ -29,10 +29,11 @@ volatile unsigned long timer1_millis;
 long milliseconds_since;
 int x;
 u8g_t u8g;
-
- unsigned int c;
- char buffer[7];
- int  num=134;
+ringbufferAveraging_t HallSensorApproximation;
+ringbufferAveraging_t Stick;
+unsigned int c;
+char buffer[7];
+int  num=134;
 
 void ADC_Init()
 {
@@ -44,6 +45,7 @@ void ADC_Init()
 	 }
 	 (void) ADCW;
 }
+
 /* ADC Einzelmessung */
 uint16_t ADC_Read( uint8_t channel )
 {
@@ -54,6 +56,7 @@ uint16_t ADC_Read( uint8_t channel )
 	}
 	return ADCW;                    // ADC auslesen und zurückgeben
 }
+
 unsigned long millis ()
 {
 	unsigned long millis_return;
@@ -65,10 +68,16 @@ unsigned long millis ()
 	
 	return millis_return;
 }
+
 ISR (TIMER1_COMPA_vect)
 {
 	timer1_millis++;
 }
+
+ISR(ADC_vect){
+
+}
+
 void flash_led ()
 {
 	unsigned long milliseconds_current = millis();
@@ -91,16 +100,16 @@ void sendData(){
 	if(lasttime+49>millis()){
 		return ;
 	}
-	int zahl = percentage(ADC_Read(ADC1D));
-	motorSpeed = zahl;
+	addValue(&Stick,percentage(ADC_Read(ADC1D)));
+	
+	motorSpeed = getRingbufferAverage(&Stick);
 	char text[20] = "0q\t";
 	char n[4];
-	integerToChar(n,zahl);
+	
+	integerToChar(n,motorSpeed);
 	strcat(text,n);
 	strcat(text,"\t1\n");
-	
-
-	
+		
 	uart_puts(text);
 	lasttime = millis();
 }
@@ -115,8 +124,9 @@ void setup()
      *  UART_BAUD_SELECT_DOUBLE_SPEED() ( double speed mode)
      */
     uart_init(UART_BAUD_SELECT_DOUBLE_SPEED(UART_BAUD_RATE,F_CPU)); 
-    	
-	 // CTC mode, Clock/8
+
+	// Timer    	
+	// CTC mode, Clock/8
 	 TCCR1B |= (1 << WGM12) | (1 << CS11);
 	  // Load the high byte, then the low byte
 	  // into the output compare
@@ -126,6 +136,8 @@ void setup()
 	  // Enable the compare match interrupt
 	  TIMSK1 |= (1 << OCIE1A);
 	  sei();
+	  //Timer ende
+	  
 	  DDRD |= (0<< PIND5);
 	  //LED-Test-pin
 	  DDRC |= (1 << PINC0);
@@ -136,6 +148,9 @@ void setup()
 	  u8g_InitI2C(&u8g, &u8g_dev_ssd1306_128x32_i2c, U8G_I2C_OPT_NONE);
 	  u8g_SetFont(&u8g,u8g_font_6x10);
 	  //u8g_SetFont(&u8g, u8g_font_04b_03);
+	  
+	  InitRingbufferAveraging(&HallSensorApproximation);
+	  InitRingbufferAveraging(&Stick);
 }
 
 void draw(void)
@@ -143,17 +158,18 @@ void draw(void)
 	static unsigned long lasttime=0;
 	static unsigned int count = 0;
 	//TODO 0 mit millis() tauschen
-	if(lasttime+100>millis()){
+	if(lasttime+50>millis()){
 		return ;
 	}
 	char a[20];
-	//sprintf(a,"%d",ADC_Read(ADC1D));
-	
+	char m[4];
+	int magnet = getRingbufferAverage(&HallSensorApproximation);
+	integerToChar(m,magnet);
 	sprintf(a,"%d",motorSpeed);
 	if(count==0)
 	{
 		u8g_FirstPage(&u8g);
-		renderDisplay(&u8g,a);
+		renderDisplay(&u8g,a,m);
 		u8g_NextPage(&u8g);
 		count = 1;
 	}
@@ -166,13 +182,26 @@ void draw(void)
 		else{
 			count++;
 		}
-		renderDisplay(&u8g,a);
+		renderDisplay(&u8g,a,m);
 		u8g_NextPage(&u8g);
 		
 	}
 	lasttime = millis();
 	
 }
+
+void sample()
+{	
+	static unsigned long lasttime=0;
+	//TODO 0 mit millis() tauschen
+	if(lasttime+20>millis()){
+		return ;
+	}
+	addValue(&HallSensorApproximation,ADC_Read(ADC3D));
+	lasttime = millis();
+}
+
+
 int main(void)
 {
 	wdt_enable(WDTO_8S);
@@ -198,8 +227,6 @@ int main(void)
 			state = display;
 			wdt_enable(WDTO_1S);
 			sendData();
-			
-			
 			wdt_disable();
 			wdt_reset();
 			break;
@@ -212,6 +239,7 @@ int main(void)
 			
 			break;
 		}
+		sample();
 		//flash_led();
 		
     }
