@@ -10,7 +10,7 @@
 #define DISPLAY_H_
 #include "u8g.h"
 void InitDisplay();
-void renderDisplay(u8g_t * u8g, char a[20]);
+void renderDisplay(u8g_t * u8g, char a[20],char b[20]);
 
 
 
