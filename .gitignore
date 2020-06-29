@@ -1,3 +1,9 @@
+#ATMEL STUDIO
+.vs/
+
+# Debug Folder
+Debug/
+
 # Prerequisites
 *.d
 
