@@ -27,7 +27,6 @@ int dir = 1;
 int motorSpeed = 0;
 volatile unsigned long timer1_millis;
 long milliseconds_since;
-int x;
 u8g_t u8g;
 ringbufferAveraging_t HallSensorApproximation;
 ringbufferAveraging_t Stick;
@@ -115,7 +114,6 @@ void sendData(){
 }
 void setup()
 {
-	x=0;
     /*
      *  Initialize UART library, pass baudrate and AVR cpu clock
      *  with the macro 
