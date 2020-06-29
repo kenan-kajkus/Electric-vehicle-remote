@@ -45,15 +45,15 @@ void ADC_Init()
 	 (void) ADCW;
 }
 
-/* ADC Einzelmessung */
+/* ADC single sample  */
 uint16_t ADC_Read( uint8_t channel )
 {
-	// Kanal waehlen, ohne andere Bits zu beeinfluﬂen
+	// Chose channel, without changing other bits
 	ADMUX = (ADMUX & ~(0x1F)) | (channel & 0x1F);
-	ADCSRA |= (1<<ADSC);            // eine Wandlung "single conversion"
-	while (ADCSRA & (1<<ADSC) ) {   // auf Abschluss der Konvertierung warten
+	ADCSRA |= (1<<ADSC);            // single conversion
+	while (ADCSRA & (1<<ADSC) ) {   // wait until conversion is finished
 	}
-	return ADCW;                    // ADC auslesen und zur¸ckgeben
+	return ADCW;                    // return ADC value
 }
 
 unsigned long millis ()
@@ -89,7 +89,7 @@ void flash_led ()
 }
 
 void sendData(){
-	//check if uart interrupt is enable
+	//check if UART interrupt is enable
 	if(UCSR0B&(1<<UDRIE0))
 	{
 		return ;
@@ -115,7 +115,7 @@ void sendData(){
 void setup()
 {
     /*
-     *  Initialize UART library, pass baudrate and AVR cpu clock
+     *  Initialize UART library, pass baud rate and AVR CPU clock
      *  with the macro 
      *  UART_BAUD_SELECT() (normal speed mode )
      *  or 
@@ -134,7 +134,7 @@ void setup()
 	  // Enable the compare match interrupt
 	  TIMSK1 |= (1 << OCIE1A);
 	  sei();
-	  //Timer ende
+	  //Timer end
 	  
 	  DDRD |= (0<< PIND5);
 	  //LED-Test-pin
@@ -155,7 +155,7 @@ void setup()
 void draw(void)
 {
 	static unsigned long lasttime=0;
-	static unsigned int count = 0;
+	
 	//TODO 0 mit millis() tauschen
 	if(lasttime+50>millis()){
 		return ;
@@ -165,28 +165,14 @@ void draw(void)
 	int magnet = getRingbufferAverage(&HallSensorApproximation);
 	integerToChar(m,magnet);
 	sprintf(a,"%d",motorSpeed);
-	if(count==0)
+
+	u8g_FirstPage(&u8g);
+	do
 	{
-		u8g_FirstPage(&u8g);
 		renderDisplay(&u8g,a,m);
-		u8g_NextPage(&u8g);
-		count = 1;
-	}
-	else
-	{
-		if (count>2)
-		{			
-			count=0;
-		}
-		else{
-			count++;
-		}
-		renderDisplay(&u8g,a,m);
-		u8g_NextPage(&u8g);
-		
-	}
-	lasttime = millis();
+	} while ( u8g_NextPage(&u8g) );
 	
+	lasttime = millis();
 }
 
 void sample()
