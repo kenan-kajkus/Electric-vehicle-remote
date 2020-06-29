@@ -145,12 +145,13 @@ void setup()
 	  CLKPR = 0x80;
 	  CLKPR = 0x00;
 
-	  u8g_InitI2C(&u8g, &u8g_dev_ssd1306_128x32_i2c, U8G_I2C_OPT_NONE);
+	  u8g_InitI2C(&u8g, &u8g_dev_ssd1306_128x32_i2c, U8G_I2C_OPT_FAST);
 	  u8g_SetFont(&u8g,u8g_font_6x10);
 	  //u8g_SetFont(&u8g, u8g_font_04b_03);
 	  
 	  InitRingbufferAveraging(&HallSensorApproximation);
 	  InitRingbufferAveraging(&Stick);
+
 }
 
 void draw(void)
