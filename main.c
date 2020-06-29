@@ -89,6 +89,7 @@ void flash_led ()
 }
 
 void sendData(){
+	wdt_enable(WDTO_1S);
 	//check if UART interrupt is enable
 	if(UCSR0B&(1<<UDRIE0))
 	{
@@ -110,6 +111,9 @@ void sendData(){
 	strcat(text,"\t1\n");
 		
 	uart_puts(text);
+
+	wdt_disable();
+	wdt_reset();
 	lasttime = millis();
 }
 void setup()
@@ -155,7 +159,8 @@ void setup()
 void draw(void)
 {
 	static unsigned long lasttime=0;
-	
+	wdt_enable(WDTO_1S);
+
 	//TODO 0 mit millis() tauschen
 	if(lasttime+50>millis()){
 		return ;
@@ -173,6 +178,8 @@ void draw(void)
 	} while ( u8g_NextPage(&u8g) );
 	
 	lasttime = millis();
+	wdt_disable();
+	wdt_reset();
 }
 
 void sample()
@@ -210,18 +217,11 @@ int main(void)
 			break;
 		case send:
 			state = display;
-			wdt_enable(WDTO_1S);
 			sendData();
-			wdt_disable();
-			wdt_reset();
 			break;
 		case display:
 			state = send;
-			wdt_enable(WDTO_1S);
-			draw();
-			wdt_disable();
-			wdt_reset();
-			
+			draw();			
 			break;
 		}
 		sample();
