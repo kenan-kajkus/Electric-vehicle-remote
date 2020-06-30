@@ -537,22 +537,10 @@
   </ItemGroup>
   <ItemGroup>
     <Folder Include="atmega-adc\" />
-    <Folder Include="atmega-adc\example\" />
     <Folder Include="oled-display\" />
     <Folder Include="u8glib\" />
     <Folder Include="u8glib\csrc\" />
     <Folder Include="u8glib\fntsrc\" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="atmega-adc\.git">
-      <SubType>compile</SubType>
-    </None>
-    <None Include="atmega-adc\LICENSE">
-      <SubType>compile</SubType>
-    </None>
-    <None Include="atmega-adc\Readme.md">
-      <SubType>compile</SubType>
-    </None>
   </ItemGroup>
   <Import Project="$(AVRSTUDIO_EXE_PATH)\\Vs\\Compiler.targets" />
 </Project>
