@@ -246,7 +246,9 @@ void integerToChar(char* chararray, int number)
 	chararray[3] = '\0';
 }
 
-int percentage(long x)
+long map(long x, long in_min, long in_max)
 {
-	return (100*x)/1023;
-} 
+	long out_min = 0;
+	long out_max = 254;
+	return (x - in_min) * (out_max - out_min) / (in_max - in_min) + out_min;
+}

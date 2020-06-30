@@ -26,6 +26,7 @@ void setup();
 void readInput();
 void sent();
 void integerToChar(char* chararray, int number);
-int percentage(long x);
 void calibration();
+long map(long x, long in_min, long in_max);
+
 #endif /* MAIN_H_ */
