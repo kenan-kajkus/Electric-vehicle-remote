@@ -37,6 +37,14 @@
 	 return millis_return;
  }
 
+ void wait(unsigned long waitMills)
+ {
+	unsigned long start = millis();
+	while (start+waitMills<millis())
+	{
+	}
+ }
+
  ISR (TIMER1_COMPA_vect)
  {
 	 timer1_millis++;

@@ -14,7 +14,7 @@ volatile unsigned long timer1_millis;
 
 void startTimer();
 unsigned long millis();
-
+void wait(unsigned long millis);
 
 
 #endif /* TIMER_H_ */
