@@ -100,7 +100,7 @@ void sendData(){
 	if(lasttime+49>millis()){
 		return ;
 	}
-	addValue(&Stick,percentage(ADC_Read(ADC1D)));
+	addValue(&Stick,percentage(ADC_Read(ADCH1)));
 	
 	motorSpeed = getRingbufferAverage(&Stick);
 	char text[20] = "0q\t";
@@ -189,7 +189,7 @@ void sample()
 	if(lasttime+20>millis()){
 		return ;
 	}
-	addValue(&HallSensorApproximation,ADC_Read(ADC3D));
+	addValue(&HallSensorApproximation,ADC_Read(ADCH3));
 	lasttime = millis();
 }
 
