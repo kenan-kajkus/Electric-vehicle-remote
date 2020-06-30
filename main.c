@@ -210,6 +210,10 @@ int main(void)
 			break;
 		case boot:
 			setup();
+			state = calibrate;
+			break;
+		case calibrate:
+			calibrate();
 			state = display;
 			break;
 		case receive:

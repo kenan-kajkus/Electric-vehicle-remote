@@ -19,7 +19,8 @@ enum statemachine
 	boot,
 	receive,
 	send,
-	display	
+	display,
+	calibrate	
 	};
 void setup();
 void readInput();
