@@ -108,6 +108,54 @@ void setup()
 
 void calibration()
 {
+	if(!(PIND & (1 << PIND5))) {
+		return;
+	}
+	calibrationHello(&u8g);
+	while (!(PIND & (1 << PIND5)))
+	{
+	}
+
+	int seconds = 5;
+	do 
+	{
+		calibrationPressedDisplay(&u8g, seconds);
+		for(int i = 20;i>0;i--)
+		{
+			wait(50);
+			sampleAnalogInput(&triggerButton);
+			if(!(PIND & (1 << PIND5))) {
+				seconds = 5;
+			}
+		}
+		seconds--;
+	} while (seconds>0 /*& pin*/ );
+
+	int a = getValue(&triggerButton);
+	
+	calibrateReslease(&u8g);
+	while (PIND & (1 << PIND5))
+	{
+	}
+
+	seconds=5;
+	do
+	{
+		calibrationReleasedDisplay(&u8g, seconds);
+		for(int i = 20;i>0;i--)
+		{
+			wait(50);
+			sampleAnalogInput(&triggerButton);
+			if(PIND & (1 << PIND5)) {
+				seconds = 5;
+			}
+		}
+		seconds--;
+	} while (seconds>0 /*& pin*/ );
+	int b = getValue(&triggerButton);
+
+
+
 	//TODO
 }
 
@@ -127,11 +175,7 @@ void draw(void)
 	integerToChar(m,magnet);
 	sprintf(a,"%d",motorSpeed);
 
-	u8g_FirstPage(&u8g);
-	do
-	{
-		renderDisplay(&u8g,a,m);
-	} while ( u8g_NextPage(&u8g) );
+	renderDisplay(&u8g,a,m);
 	
 	lasttime = millis();
 	wdt_disable();
