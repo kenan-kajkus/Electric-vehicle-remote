@@ -15,6 +15,7 @@
 #include <avr/wdt.h>
 #include <string.h>
 
+#include "atmega-adc/atmega-adc.h"
 #include "display.h"
 #include "ringbufferAveraging.h"
 
@@ -73,10 +74,6 @@ ISR (TIMER1_COMPA_vect)
 	timer1_millis++;
 }
 
-ISR(ADC_vect){
-
-}
-
 void flash_led ()
 {
 	unsigned long milliseconds_current = millis();
@@ -100,7 +97,7 @@ void sendData(){
 	if(lasttime+49>millis()){
 		return ;
 	}
-	addValue(&Stick,percentage(ADC_Read(ADCH1)));
+	addValue(&Stick,percentage(adc_read(ADC_PRESCALER_2,ADC_VREF_AVCC,ADCH1)));
 	
 	motorSpeed = getRingbufferAverage(&Stick);
 	char text[20] = "0q\t";
@@ -156,6 +153,11 @@ void setup()
 
 }
 
+void calibration()
+{
+	//TODO
+}
+
 void draw(void)
 {
 	static unsigned long lasttime=0;
@@ -189,7 +191,7 @@ void sample()
 	if(lasttime+20>millis()){
 		return ;
 	}
-	addValue(&HallSensorApproximation,ADC_Read(ADCH3));
+	addValue(&HallSensorApproximation,adc_read(ADC_PRESCALER_2,ADC_VREF_AVCC,ADCH3));
 	lasttime = millis();
 }
 
@@ -213,7 +215,7 @@ int main(void)
 			state = calibrate;
 			break;
 		case calibrate:
-			calibrate();
+			calibration();
 			state = display;
 			break;
 		case receive:

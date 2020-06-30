@@ -27,4 +27,5 @@ void readInput();
 void sent();
 void integerToChar(char* chararray, int number);
 int percentage(long x);
+void calibration();
 #endif /* MAIN_H_ */
