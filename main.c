@@ -87,7 +87,8 @@ void setup()
 	uart_init(UART_BAUD_SELECT_DOUBLE_SPEED(UART_BAUD_RATE,F_CPU)); 
 	startTimer();
 	ADC_Init();
-	  
+	
+	PORTD |= (1<<PIND5);  
 	DDRD |= (0<< PIND5);
 	//LED-Test-pin
 	DDRC |= (1 << PINC0);
@@ -109,12 +110,12 @@ void setup()
 
 void calibration()
 {
-	if((PIND & (1 << PIND5)) != (1 << PIND5)) {
+	if((PIND & (1 << PIND5)) == (1 << PIND5)) {
 		return;
 	}
 	calibrationHello(&u8g);
 	wait(1000);
-	while ((PIND & (1 << PIND5)) != (1 << PIND5))
+	while ((PIND & (1 << PIND5)) == (1 << PIND5))
 	{
 	}
 
@@ -126,7 +127,7 @@ void calibration()
 		{
 			wait(50);
 			sampleAnalogInput(&triggerButton);
-			if((PIND & (1 << PIND5)) != (1 << PIND5)) {
+			if((PIND & (1 << PIND5)) == (1 << PIND5)) {
 				seconds = 6;
 			}
 		}
@@ -136,7 +137,7 @@ void calibration()
 	//int a = getValue(&triggerButton);
 	
 	calibrateReslease(&u8g);
-	while (PIND & (1 << PIND5))
+	while ((PIND & (1 << PIND5)) != (1 << PIND5))
 	{
 	}
 
@@ -148,9 +149,9 @@ void calibration()
 		{
 			wait(50);
 			sampleAnalogInput(&triggerButton);
-			if(PIND & (1 << PIND5)) 
+			if((PIND & (1 << PIND5)) != (1 << PIND5)) 
 			{
-				seconds = 5;
+				seconds = 6;
 			}
 		}
 		seconds--;
