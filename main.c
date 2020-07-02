@@ -28,10 +28,12 @@ long milliseconds_since;
 u8g_t u8g;
 ringbufferAveraging_t HallSensorApproximation;
 ringbufferAveraging_t StickXBuffer;
+ringbufferAveraging_t StickYBuffer;
 ringbufferAveraging_t triggerButtonBuffer;
 
 bufferedAnalogInput triggerButton;
 bufferedAnalogInput stickX;
+bufferedAnalogInput stickY;
 
 unsigned int c;
 char buffer[7];
@@ -62,12 +64,26 @@ void sendData(){
 	}
 	
 	motorSpeed = getValue(&stickX);
-	char text[20] = "0q\t";
-	char n[4];
+	int sy = getValue(&stickY);
+	int mag = getValue(&triggerButton);
+	char text[20] = "";
+	char n[5];
+	char magStr[5];
 	
-	integerToChar(n,motorSpeed);
+	//integerToChar(n,motorSpeed);
+	char test[5];
+	sprintf(test,"%d",motorSpeed);
+	sprintf(n,"%d",sy);
+	sprintf(magStr,"%d",mag);
+	strcat(text,"x");
+	strcat(text,test);
+	strcat(text,"\t");
+	strcat(text,"y");
 	strcat(text,n);
-	strcat(text,"\t1\n");
+	strcat(text,"\t");
+	strcat(text,"m");
+	strcat(text,magStr);
+	strcat(text,"\n");
 		
 	uart_puts(text);
 
@@ -102,10 +118,12 @@ void setup()
 	  
 	InitRingbufferAveraging(&HallSensorApproximation);
 	InitRingbufferAveraging(&StickXBuffer);
+	InitRingbufferAveraging(&StickYBuffer);
 	InitRingbufferAveraging(&triggerButtonBuffer);
 
 	InitBufferedAnalogInput(&triggerButton,ADCH3,50,&triggerButtonBuffer);
 	InitBufferedAnalogInput(&stickX,ADCH1,10,&StickXBuffer);
+	InitBufferedAnalogInput(&stickY,ADCH2,10,&StickYBuffer);
 }
 
 void calibration()
@@ -188,6 +206,7 @@ void sample()
 {	
 	sampleAnalogInput(&triggerButton);
 	sampleAnalogInput(&stickX);
+	sampleAnalogInput(&stickY);
 }
 
 
