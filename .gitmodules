@@ -1,6 +1,3 @@
 [submodule "u8glib"]
 	path = u8glib
 	url = https://github.com/olikraus/u8glib
-[submodule "atmega-adc"]
-	path = atmega-adc
-	url = https://github.com/jvalrog/atmega-adc
