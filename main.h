@@ -10,7 +10,7 @@
 #define MAIN_H_
 
 /* Define UART baud rate here */
-#define UART_BAUD_RATE      115200
+#define UART_BAUD_RATE      38400
 
 volatile  int receivedUart = 0;
 enum statemachine

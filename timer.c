@@ -40,7 +40,7 @@
  void wait(unsigned long waitMills)
  {
 	unsigned long start = millis();
-	while (start+waitMills<millis())
+	while ( start+waitMills > millis())
 	{
 	}
  }

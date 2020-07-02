@@ -8,17 +8,21 @@
 
 #ifndef RINGBUFFERAVERAGING_H_
 #define RINGBUFFERAVERAGING_H_
-#define bufferSizeShift 5
+
+
+#include <stdint.h>
+
+#define bufferSizeShift 4
 
 typedef struct _approximation_t ringbufferAveraging_t;
 
 void InitRingbufferAveraging(ringbufferAveraging_t * _ringbufferAveraging);
-void addValue(ringbufferAveraging_t * _approximation, int newValue);
-int getRingbufferAverage(ringbufferAveraging_t * _approximation);
+void addValue(ringbufferAveraging_t * _approximation, uint16_t newValue);
+uint16_t getRingbufferAverage(ringbufferAveraging_t * _approximation);
 
 struct _approximation_t
 {
-	int * values;
+	uint16_t * values;
 	int bufferSize;
 	int bufferHead;
 };

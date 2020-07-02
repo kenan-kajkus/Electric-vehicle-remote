@@ -14,17 +14,16 @@
 
 typedef struct _triggerButton_t bufferedAnalogInput;
 
-void InitBufferedAnalogInput(bufferedAnalogInput * _analogInput, uint8_t prescaler, uint8_t vref, uint8_t channel, uint8_t samplerate, ringbufferAveraging_t * buffer);
+void InitBufferedAnalogInput(bufferedAnalogInput * _analogInput, uint8_t channel, unsigned long samplerate, ringbufferAveraging_t * buffer);
 void sampleAnalogInput(bufferedAnalogInput * analogInput);
-int getValue(bufferedAnalogInput * analogInput);
+uint16_t getValue(bufferedAnalogInput * analogInput);
 
 struct _triggerButton_t
 {
-	uint8_t prescaler;
-	uint8_t vref;
 	uint8_t channel;
-	uint8_t samplerate;
+	unsigned long samplerate;
 	ringbufferAveraging_t * buffer;
+	unsigned long lasttime;
 };
 
 

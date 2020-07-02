@@ -14,7 +14,7 @@
 #include <avr/wdt.h>
 #include <string.h>
 
-#include "atmega-adc/atmega-adc.h"
+#include "adc.h"
 #include "display.h"
 #include "ringbufferAveraging.h"
 #include "triggerButton.h"
@@ -86,6 +86,7 @@ void setup()
 	*/
 	uart_init(UART_BAUD_SELECT_DOUBLE_SPEED(UART_BAUD_RATE,F_CPU)); 
 	startTimer();
+	ADC_Init();
 	  
 	DDRD |= (0<< PIND5);
 	//LED-Test-pin
@@ -95,24 +96,25 @@ void setup()
 	CLKPR = 0x00;
 
 	u8g_InitI2C(&u8g, &u8g_dev_ssd1306_128x32_i2c, U8G_I2C_OPT_FAST);
-	u8g_SetFont(&u8g,u8g_font_6x10);
+	u8g_SetFont(&u8g,u8g_font_5x8);
 	//u8g_SetFont(&u8g, u8g_font_04b_03);
 	  
 	InitRingbufferAveraging(&HallSensorApproximation);
 	InitRingbufferAveraging(&StickXBuffer);
 	InitRingbufferAveraging(&triggerButtonBuffer);
 
-	InitBufferedAnalogInput(&triggerButton,ADC_PRESCALER_2,ADC_VREF_AVCC,ADCH3,5,&triggerButtonBuffer);
-	InitBufferedAnalogInput(&stickX,ADC_PRESCALER_2,ADC_VREF_AVCC,ADCH1,5,&StickXBuffer);
+	InitBufferedAnalogInput(&triggerButton,ADCH3,50,&triggerButtonBuffer);
+	InitBufferedAnalogInput(&stickX,ADCH1,10,&StickXBuffer);
 }
 
 void calibration()
 {
-	if(!(PIND & (1 << PIND5))) {
+	if((PIND & (1 << PIND5)) != (1 << PIND5)) {
 		return;
 	}
 	calibrationHello(&u8g);
-	while (!(PIND & (1 << PIND5)))
+	wait(1000);
+	while ((PIND & (1 << PIND5)) != (1 << PIND5))
 	{
 	}
 
@@ -124,14 +126,14 @@ void calibration()
 		{
 			wait(50);
 			sampleAnalogInput(&triggerButton);
-			if(!(PIND & (1 << PIND5))) {
-				seconds = 5;
+			if((PIND & (1 << PIND5)) != (1 << PIND5)) {
+				seconds = 6;
 			}
 		}
 		seconds--;
 	} while (seconds>0 /*& pin*/ );
 
-	int a = getValue(&triggerButton);
+	//int a = getValue(&triggerButton);
 	
 	calibrateReslease(&u8g);
 	while (PIND & (1 << PIND5))
@@ -142,21 +144,20 @@ void calibration()
 	do
 	{
 		calibrationReleasedDisplay(&u8g, seconds);
-		for(int i = 20;i>0;i--)
+		for(int i = 20; i>0; i--)
 		{
 			wait(50);
 			sampleAnalogInput(&triggerButton);
-			if(PIND & (1 << PIND5)) {
+			if(PIND & (1 << PIND5)) 
+			{
 				seconds = 5;
 			}
 		}
 		seconds--;
 	} while (seconds>0 /*& pin*/ );
-	int b = getValue(&triggerButton);
+	
+	//int b = getValue(&triggerButton);
 
-
-
-	//TODO
 }
 
 void draw(void)
@@ -165,17 +166,17 @@ void draw(void)
 	wdt_enable(WDTO_1S);
 
 	//TODO 0 mit millis() tauschen
-	if(lasttime+50>millis()){
+	if(lasttime+100>millis()){
 		return ;
 	}
 	char a[20];
-	char m[4];
-	int magnet = getValue(&triggerButton);
+	char b[20];
+	uint16_t a1 = getValue(&stickX);
+	uint16_t b1 = getValue(&triggerButton);
+	sprintf(a,"%d",a1);
+	sprintf(b,"%d",b1);
 
-	integerToChar(m,magnet);
-	sprintf(a,"%d",motorSpeed);
-
-	renderDisplay(&u8g,a,m);
+	renderDisplay(&u8g,a,b);
 	
 	lasttime = millis();
 	wdt_disable();
@@ -226,15 +227,6 @@ int main(void)
 		//flash_led();
 		
     }
-}
-
-void readInput()
-{
-	static unsigned long lasttime=0;
-	//TODO 0 mit millis() tauschen
-	if(lasttime+50>millis()){
-		return ;
-	}
 }
 
 

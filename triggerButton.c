@@ -5,31 +5,29 @@
  *  Author: kajku001
  */ 
 #include "triggerButton.h"
-#include "atmega-adc/atmega-adc.h"
+#include "adc.h"
 #include "timer.h"
 
-void InitBufferedAnalogInput(bufferedAnalogInput * _analogInput, uint8_t prescaler, uint8_t vref, uint8_t channel, uint8_t samplerate, ringbufferAveraging_t * buffer)
+void InitBufferedAnalogInput(bufferedAnalogInput * _analogInput, uint8_t channel, unsigned long samplerate, ringbufferAveraging_t * buffer)
 {
-	_analogInput->prescaler = prescaler;
-	_analogInput->vref = vref;
 	_analogInput->channel = channel;
 	_analogInput->samplerate = samplerate;
 	_analogInput->buffer = buffer;
+	_analogInput->lasttime = 0;
 }
 
 void sampleAnalogInput(bufferedAnalogInput * _analogInput)
 {
-	static unsigned long lasttime=0;
-	if(lasttime + _analogInput->samplerate >millis()){
+	if((_analogInput->lasttime + _analogInput->samplerate) > millis()){
 		return ;
 	}
-	uint16_t sampleValue = adc_read(_analogInput->prescaler, _analogInput->vref, _analogInput->channel);
+	uint16_t sampleValue = ADC_Read(_analogInput->channel);
 	addValue(_analogInput->buffer, sampleValue);
 
-	lasttime = millis();
+	_analogInput->lasttime = millis();
 }
 
-int getValue(bufferedAnalogInput * analogInput)
+uint16_t getValue(bufferedAnalogInput * analogInput)
 {	
 	ringbufferAveraging_t * tempBuffer = analogInput->buffer; 
 	return getRingbufferAverage(tempBuffer);
