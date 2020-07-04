@@ -12,6 +12,7 @@
 #include <avr/io.h>
 #include <avr/interrupt.h>
 #include <avr/wdt.h>
+#include <avr/eeprom.h>
 #include <string.h>
 
 #include "adc.h"
@@ -152,8 +153,8 @@ void calibration()
 		seconds--;
 	} while (seconds>0 /*& pin*/ );
 
-	//int a = getValue(&triggerButton);
-	
+	uint16_t a = getValue(&triggerButton);
+	eeprom_write_word(&a,0x00);
 	calibrateReslease(&u8g);
 	while ((PIND & (1 << PIND5)) != (1 << PIND5))
 	{
@@ -175,8 +176,8 @@ void calibration()
 		seconds--;
 	} while (seconds>0 /*& pin*/ );
 	
-	//int b = getValue(&triggerButton);
-
+	uint16_t b = getValue(&triggerButton);
+	eeprom_write_word(&b,0x02);
 }
 
 void draw(void)
